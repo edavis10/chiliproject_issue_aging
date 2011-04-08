@@ -7,6 +7,36 @@ module ChiliprojectIssueAging
         base.send(:include, InstanceMethods)
         base.class_eval do
           unloadable
+
+          named_scope :aging_status, lambda {
+            # Find the minimum number of days to check against
+            status_journal_created_before = nil
+            if Setting.plugin_chiliproject_issue_aging['status_warning_days'].present?
+              status_journal_created_before = Setting.plugin_chiliproject_issue_aging['status_warning_days'].to_i
+            end
+
+            if Setting.plugin_chiliproject_issue_aging['status_error_days'].present? &&
+              status_journal_created_before >= Setting.plugin_chiliproject_issue_aging['status_error_days'].to_i
+              status_journal_created_before = Setting.plugin_chiliproject_issue_aging['status_error_days'].to_i
+            end
+
+            if status_journal_created_before
+              c = ARCondition.new
+              c.add "#{JournalDetail.table_name}.property = 'attr'"
+              c.add "#{JournalDetail.table_name}.prop_key = 'status_id'"
+              c.add ["#{Journal.table_name}.created_on <= ?", status_journal_created_before.days.ago]
+              c.add "#{JournalDetail.table_name}.value = CAST(#{Issue.table_name}.status_id AS varchar(13))"
+
+              return {
+                :include => [:journals => :details],
+                :order => "#{Journal.table_name}.created_on DESC",
+                :conditions => c.conditions
+              }
+            else
+              # empty set
+              return { :conditions => "0=1" }
+            end
+          }
         end
       end
 

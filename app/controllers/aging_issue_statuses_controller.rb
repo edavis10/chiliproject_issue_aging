@@ -2,7 +2,7 @@ class AgingIssueStatusesController < ApplicationController
   unloadable
 
   def index
-    render :text => 'hi'
+    @issues = Issue.visible.aging_status
   end
   
 end

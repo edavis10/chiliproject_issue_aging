@@ -36,7 +36,17 @@ class ListAgingIssuesTest < ActionController::IntegrationTest
       assert_response :success
     end
     
-    should "show a list of issues"
+    should "show a list of issues" do
+      visit '/aging_issue_statuses'
+      assert_response :success
+
+      assert find("table.issues")
+      assert find("tr#issue-#{@warning_issue1.id}")
+      assert find("tr#issue-#{@warning_issue2.id}")
+      assert find("tr#issue-#{@error_issue1.id}")
+      assert find("tr#issue-#{@error_issue2.id}")
+    end
+    
     should "show orange next to warning issues"
     should "show red next to warning issues"
     should "not show issues that aren't aging"
