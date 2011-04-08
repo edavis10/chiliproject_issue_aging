@@ -25,6 +25,15 @@ class ChiliprojectIssueAging::Patches::IssueTest < ActionController::TestCase
       generate_journal_for_status_change(@issue, 20.days.ago)
       assert_equal :error, @issue.aging_status
     end
+
+    should "return nil when the issue is closed" do
+      @status = IssueStatus.generate!(:is_closed => true)
+      @issue.update_attribute(:status_id, @status.id)
+      @issue.reload
+      generate_journal_for_status_change(@issue, 20.days.ago)
+
+      assert_equal nil, @issue.aging_status
+    end
   end
 
   context "Issue#aging_status_warning?" do
@@ -40,6 +49,15 @@ class ChiliprojectIssueAging::Patches::IssueTest < ActionController::TestCase
 
     should "return false when status has been more than the warning and more than error" do
       generate_journal_for_status_change(@issue, 20.days.ago)
+      assert_equal false, @issue.aging_status_warning?
+    end
+
+    should "return false when issue is closed" do
+      @status = IssueStatus.generate!(:is_closed => true)
+      @issue.update_attribute(:status_id, @status.id)
+      @issue.reload
+      generate_journal_for_status_change(@issue, 8.days.ago)
+
       assert_equal false, @issue.aging_status_warning?
     end
   end
@@ -58,6 +76,15 @@ class ChiliprojectIssueAging::Patches::IssueTest < ActionController::TestCase
     should "return true when status has been more than the warning and more than error" do
       generate_journal_for_status_change(@issue, 20.days.ago)
       assert_equal true, @issue.aging_status_error?
+    end
+
+    should "return false when issue is closed" do
+      @status = IssueStatus.generate!(:is_closed => true)
+      @issue.update_attribute(:status_id, @status.id)
+      @issue.reload
+      generate_journal_for_status_change(@issue, 20.days.ago)
+
+      assert_equal false, @issue.aging_status_error?
     end
   end
 end

@@ -9,12 +9,14 @@ class ListAgingIssuesTest < ActionController::IntegrationTest
     User.add_to_project(@user, @project, @role)
     @status = IssueStatus.generate!
     @old_status = IssueStatus.generate!
-
+    @closed_status = IssueStatus.generate!(:is_closed => true)
+    
     @warning_issue1 = Issue.generate_for_project!(@project, :status => @status, :created_on => 30.days.ago)
     @warning_issue2 = Issue.generate_for_project!(@project, :status => @status, :created_on => 30.days.ago)
     @error_issue1 = Issue.generate_for_project!(@project, :status => @status, :created_on => 30.days.ago)
     @error_issue2 = Issue.generate_for_project!(@project, :status => @status, :created_on => 30.days.ago)
     @not_aging_issue = Issue.generate_for_project!(@project, :status => @status, :created_on => 30.days.ago)
+    @closed_issue = Issue.generate_for_project!(@project, :status => @closed_status, :created_on => 30.days.ago)
 
     @not_visible_project = Project.generate!
     @not_visible_issue = Issue.generate_for_project!(@not_visible_project, :status => @status, :created_on => 30.days.ago)
@@ -25,6 +27,7 @@ class ListAgingIssuesTest < ActionController::IntegrationTest
     generate_journal_for_status_change(@error_issue2, 17.days.ago)
     generate_journal_for_status_change(@not_aging_issue, 1.day.ago)
     generate_journal_for_status_change(@not_visible_issue, 29.days.ago)
+    generate_journal_for_status_change(@closed_issue, 29.days.ago)
 
     login_as(@user.login, 'test')
     visit_home
@@ -75,6 +78,13 @@ class ListAgingIssuesTest < ActionController::IntegrationTest
       assert_response :success
 
       assert has_no_css?("tr#issue-#{@not_visible_issue.id}")
+    end
+
+    should "not show closed issues" do
+      visit '/aging_issue_statuses'
+      assert_response :success
+
+      assert has_no_css?("tr#issue-#{@closed_issue.id}")
     end
   end
 end

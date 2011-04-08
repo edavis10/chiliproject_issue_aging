@@ -66,6 +66,7 @@ module ChiliprojectIssueAging
         # @return [Symbol, :error] the issue has aged into the error state
         def aging_status
           return nil if journals.empty?
+          return nil if closed?
 
           if Setting.plugin_chiliproject_issue_aging['status_error_days'].present?
             error_days = Setting.plugin_chiliproject_issue_aging['status_error_days'].to_i

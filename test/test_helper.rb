@@ -123,7 +123,7 @@ class ActiveSupport::TestCase
     jd = JournalDetail.new(:property => 'attr',
                            :prop_key => 'status_id',
                            :old_value => @old_status.id,
-                           :value => @status.id)
+                           :value => issue.status.id)
     j.details << jd
     assert j.save
 
