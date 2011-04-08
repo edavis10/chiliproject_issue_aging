@@ -1,0 +1,10 @@
+<p>
+  <%= content_tag(:label, l(:issue_aging_text_number_of_days_for_warning), :for => 'settings_status_warning_days') %>
+  <%= text_field_tag("settings[status_warning_days]", @settings['status_warning_days']) %>
+</p>
+
+<p>
+  <%= content_tag(:label, l(:issue_aging_text_number_of_days_for_error), :for => 'settings_status_error_days') %>
+  <%= text_field_tag("settings[status_error_days]", @settings['status_error_days']) %>
+</p>
+

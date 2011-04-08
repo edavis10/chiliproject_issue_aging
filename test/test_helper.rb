@@ -14,12 +14,19 @@ end
 
 module ChiliProjectIntegrationTestHelper
   def login_as(user="existing", password="existing")
+    visit "/logout" # Make sure the session is cleared
+
     visit "/login"
     fill_in 'Login', :with => user
     fill_in 'Password', :with => password
-    click_button 'login'
+    click_button 'Login'
     assert_response :success
     assert User.current.logged?
+  end
+
+  def visit_home
+    visit '/'
+    assert_response :success
   end
 
   def visit_project(project)
@@ -68,9 +75,24 @@ module ChiliProjectIntegrationTestHelper
 
 end
 
+module ChiliProjectIssueAgingIntegrationTestHelper
+  def visit_configuration_panel
+    visit_home
+    click_link 'Administration'
+    assert_response :success
+
+    click_link 'Plugins'
+    assert_response :success
+
+    click_link 'Configure'
+    assert_response :success
+  end
+  
+end
+
 class ActionController::IntegrationTest
   include ChiliProjectIntegrationTestHelper
-  
+  include ChiliProjectIssueAgingIntegrationTestHelper
   include Capybara
   
 end
@@ -89,5 +111,9 @@ class ActiveSupport::TestCase
 
   def reconfigure_plugin(configuration_change)
     Settings['plugin_TODO'] = Setting['plugin_TODO'].merge(configuration_change)
+  end
+
+  def plugin_configuration
+    Setting.plugin_chiliproject_issue_aging
   end
 end

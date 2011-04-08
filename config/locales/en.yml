@@ -1,3 +1,3 @@
-# English strings go here for Rails i18n
 en:
-  my_label: "My label"
+  issue_aging_text_number_of_days_for_warning: "Number of days before an issue enters the warning state"
+  issue_aging_text_number_of_days_for_error: "Number of days before an issue enters the error state"

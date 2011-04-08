@@ -9,4 +9,10 @@ Redmine::Plugin.register :chiliproject_issue_aging do
   version '0.1.0'
 
   requires_redmine :version_or_higher => '1.0.0'
+
+  settings(:partial => 'settings/issue_aging',
+           :default => {
+             'status_warning_days' => '7',
+             'status_error_days' => '14'
+           })
 end
