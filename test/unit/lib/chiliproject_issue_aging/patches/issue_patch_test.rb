@@ -35,7 +35,10 @@ class ChiliprojectIssueAging::Patches::IssueTest < ActionController::TestCase
       assert_equal :warning, @issue.aging_status
     end
     
-    should "return :error when status has been more than the warning and more than error"
+    should "return :error when status has been more than the warning and more than error" do
+      generate_journal_for_status_change(20.days.ago)
+      assert_equal :error, @issue.aging_status
+    end
   end
 
   context "Issue#aging_status_warning?" do
