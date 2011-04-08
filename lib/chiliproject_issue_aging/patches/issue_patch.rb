@@ -16,6 +16,16 @@ module ChiliprojectIssueAging
       module InstanceMethods
         def aging_status
           return nil if journals.empty?
+
+          if Setting.plugin_chiliproject_issue_aging['status_error_days'].present?
+            error_days = Setting.plugin_chiliproject_issue_aging['status_error_days'].to_i
+          end
+
+          if Setting.plugin_chiliproject_issue_aging['status_warning_days'].present?
+            warning_days = Setting.plugin_chiliproject_issue_aging['status_warning_days'].to_i
+          end
+
+          return nil if error_days.nil? && warning_days.nil? # Short circuit if no days configured
           
           c = ARCondition.new
           c.add "#{JournalDetail.table_name}.property = 'attr'"
@@ -25,23 +35,16 @@ module ChiliprojectIssueAging
                                                  :order => 'created_on DESC',
                                                  :conditions => c.conditions)
           if status_change_journal
-            if Setting.plugin_chiliproject_issue_aging['status_error_days'].present?
-              error_days = Setting.plugin_chiliproject_issue_aging['status_error_days'].to_i
-            end
 
             if error_days.present? && status_change_journal.created_on <= error_days.days.ago
               return :error
             end
 
-            if Setting.plugin_chiliproject_issue_aging['status_warning_days'].present?
-              warning_days = Setting.plugin_chiliproject_issue_aging['status_warning_days'].to_i
-            end
 
             if warning_days.present? && status_change_journal.created_on <= warning_days.days.ago
               return :warning
             end
           end
-          return nil
         end
         
       end
