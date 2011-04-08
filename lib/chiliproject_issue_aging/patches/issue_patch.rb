@@ -27,20 +27,18 @@ module ChiliprojectIssueAging
           if status_change_journal
             if Setting.plugin_chiliproject_issue_aging['status_error_days'].present?
               error_days = Setting.plugin_chiliproject_issue_aging['status_error_days'].to_i
-              if status_change_journal.created_on <= error_days.days.ago
-                return :error
-              end
+            end
+
+            if error_days.present? && status_change_journal.created_on <= error_days.days.ago
+              return :error
             end
 
             if Setting.plugin_chiliproject_issue_aging['status_warning_days'].present?
               warning_days = Setting.plugin_chiliproject_issue_aging['status_warning_days'].to_i
-              if status_change_journal.created_on > warning_days.days.ago
-                # Status change is newer than warning
-                return nil
-              elsif status_change_journal.created_on <= warning_days.days.ago
-                return :warning
-              end
-              
+            end
+
+            if warning_days.present? && status_change_journal.created_on <= warning_days.days.ago
+              return :warning
             end
           end
           return nil
