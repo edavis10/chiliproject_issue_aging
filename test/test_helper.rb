@@ -104,13 +104,14 @@ class ActiveSupport::TestCase
   end
 
   def configure_plugin(configuration_change={})
-    Setting.plugin_TODO = {
-      
+    Setting.plugin_chiliproject_issue_aging = {
+      'status_warning_days' => '7',
+      'status_error_days' => '14'
     }.merge(configuration_change)
   end
 
   def reconfigure_plugin(configuration_change)
-    Settings['plugin_TODO'] = Setting['plugin_TODO'].merge(configuration_change)
+    Settings['plugin_chiliproject_issue_aging'] = Setting['plugin_chiliproject_issue_aging'].merge(configuration_change)
   end
 
   def plugin_configuration

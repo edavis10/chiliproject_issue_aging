@@ -16,3 +16,9 @@ Redmine::Plugin.register :chiliproject_issue_aging do
              'status_error_days' => '14'
            })
 end
+
+require 'dispatcher'
+Dispatcher.to_prepare :chiliproject_issue_aging do
+  require_dependency 'issue'
+  Issue.send(:include, ChiliprojectIssueAging::Patches::IssuePatch)
+end
