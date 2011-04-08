@@ -25,7 +25,7 @@ module ChiliprojectIssueAging
               c.add "#{JournalDetail.table_name}.property = 'attr'"
               c.add "#{JournalDetail.table_name}.prop_key = 'status_id'"
               c.add ["#{Journal.table_name}.created_on <= ?", status_journal_created_before.days.ago]
-              c.add "#{JournalDetail.table_name}.value = CAST(#{Issue.table_name}.status_id AS varchar(13))"
+              c.add "#{JournalDetail.table_name}.value = CAST(#{Issue.table_name}.status_id AS CHAR(13))"
 
               return {
                 :include => [:journals => :details],
