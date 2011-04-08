@@ -4,6 +4,10 @@ class ChiliprojectIssueAging::Patches::IssueTest < ActionController::TestCase
 
   def setup
     configure_plugin
+    @project = Project.generate!
+    @status = IssueStatus.generate!
+    @old_status = IssueStatus.generate!
+    @issue = Issue.generate_for_project!(@project, :status => @status, :created_on => 30.days.ago)
   end
 
   def generate_journal_for_status_change(created_on=Time.now)
@@ -18,13 +22,6 @@ class ChiliprojectIssueAging::Patches::IssueTest < ActionController::TestCase
   end
   
   context "Issue#aging_status" do
-    setup do
-      @project = Project.generate!
-      @status = IssueStatus.generate!
-      @old_status = IssueStatus.generate!
-      @issue = Issue.generate_for_project!(@project, :status => @status, :created_on => 30.days.ago)
-    end
-    
     should "return nil when status has been less than the warning" do
       generate_journal_for_status_change(Time.now)
       assert_equal nil, @issue.aging_status
@@ -42,14 +39,36 @@ class ChiliprojectIssueAging::Patches::IssueTest < ActionController::TestCase
   end
 
   context "Issue#aging_status_warning?" do
-    should "return false when status has been less than the warning"
-    should "return true when status has been more than the warning but less than error"
-    should "return false when status has been more than the warning and more than error"
+    should "return false when status has been less than the warning" do
+      generate_journal_for_status_change(Time.now)
+      assert_equal false, @issue.aging_status_warning?
+    end
+
+    should "return true when status has been more than the warning but less than error" do
+      generate_journal_for_status_change(8.days.ago)
+      assert_equal true, @issue.aging_status_warning?
+    end
+
+    should "return false when status has been more than the warning and more than error" do
+      generate_journal_for_status_change(20.days.ago)
+      assert_equal false, @issue.aging_status_warning?
+    end
   end
 
-  context "Issue#aging_status_warning?" do
-    should "return false when status has been less than the warning"
-    should "return false when status has been more than the warning but less than error"
-    should "return true when status has been more than the warning and more than error"
+  context "Issue#aging_status_error?" do
+    should "return false when status has been less than the warning" do
+      generate_journal_for_status_change(Time.now)
+      assert_equal false, @issue.aging_status_error?
+    end
+
+    should "return false when status has been more than the warning but less than error" do
+      generate_journal_for_status_change(8.days.ago)
+      assert_equal false, @issue.aging_status_error?
+    end
+
+    should "return true when status has been more than the warning and more than error" do
+      generate_journal_for_status_change(20.days.ago)
+      assert_equal true, @issue.aging_status_error?
+    end
   end
 end

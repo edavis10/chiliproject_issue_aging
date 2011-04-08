@@ -14,6 +14,14 @@ module ChiliprojectIssueAging
       end
 
       module InstanceMethods
+        def aging_status_warning?
+          aging_status == :warning
+        end
+
+        def aging_status_error?
+          aging_status == :error
+        end
+        
         def aging_status
           return nil if journals.empty?
 
