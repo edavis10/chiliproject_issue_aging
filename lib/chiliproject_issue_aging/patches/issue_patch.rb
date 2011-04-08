@@ -14,14 +14,26 @@ module ChiliprojectIssueAging
       end
 
       module InstanceMethods
+        # Has the issue entered the aging warning state for it's status?
+        #
+        # @return [Bool]
         def aging_status_warning?
           aging_status == :warning
         end
 
+        # Has the issue entered the aging error state for it's status?
+        #
+        # @return [Bool]
         def aging_status_error?
           aging_status == :error
         end
         
+        # Checks if the issue has been aging at it's current status and triggers
+        # an aging state
+        #
+        # @return [nil]
+        # @return [Symbol, :warning] the issue has aged into the warning state
+        # @return [Symbol, :error] the issue has aged into the error state
         def aging_status
           return nil if journals.empty?
 
