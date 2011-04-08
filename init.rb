@@ -22,3 +22,5 @@ Dispatcher.to_prepare :chiliproject_issue_aging do
   require_dependency 'issue'
   Issue.send(:include, ChiliprojectIssueAging::Patches::IssuePatch)
 end
+require 'chiliproject_issue_aging/hooks/view_kanbans_issue_details_hook'
+require 'chiliproject_issue_aging/hooks/view_layouts_base_html_head_hook'
