@@ -1,3 +1,36 @@
 <%= content_tag(:h1, l(:issue_aging_text_title)) %>
 
-<%= render :partial => 'issues/list_simple', :locals => {:issues => @issues} %>
+<% if @issues && @issues.any? %>
+  <table class="list issues">
+    <thead><tr>
+    <th>#</th>
+    <th><%=l(:issue_aging_text_last_status_change)%></th>
+    <th><%=l(:field_project)%></th>
+    <th><%=l(:field_subject)%></th>
+    </tr></thead>
+    <tbody> 
+    <% @issues.each do |issue| %>
+    <tr id="issue-<%= issue.id %>" class="<%= cycle('odd', 'even') %> <%= issue.css_classes %>">
+      <td class="id">
+        <%= link_to issue.id, :controller => 'issues', :action => 'show', :id => issue %>
+      </td>
+      <td class="<%= aging_issue_css(issue) %>">
+        <% journal = issue.last_status_change_journal %>
+        <%= format_time(journal.created_on) if journal %>
+      </td>
+      <td class="project"><%= link_to_project(issue.project) %></td>
+      <td class="subject">
+        <%= link_to_issue(issue) %>
+      </td>
+    </tr>
+    <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% end %>
+
+<style type="text/css">
+.aging.warning-state { background-color: #FDBF3B; }
+.aging.error-state { background-color: #dd0000; color: #FFFFFF; }
+</style>

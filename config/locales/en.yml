@@ -2,3 +2,4 @@ en:
   issue_aging_text_number_of_days_for_warning: "Number of days before an issue enters the warning state"
   issue_aging_text_number_of_days_for_error: "Number of days before an issue enters the error state"
   issue_aging_text_title: "Aging Issues"
+  issue_aging_text_last_status_change: "Last status change"
