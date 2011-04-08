@@ -77,13 +77,8 @@ module ChiliprojectIssueAging
 
           return nil if error_days.nil? && warning_days.nil? # Short circuit if no days configured
           
-          c = ARCondition.new
-          c.add "#{JournalDetail.table_name}.property = 'attr'"
-          c.add "#{JournalDetail.table_name}.prop_key = 'status_id'"
-          c.add ["#{JournalDetail.table_name}.value = ?", status_id.to_s] # value is converted to String
-          status_change_journal = journals.first(:include => :details,
-                                                 :order => 'created_on DESC',
-                                                 :conditions => c.conditions)
+          status_change_journal = last_status_change_journal
+          
           if status_change_journal
 
             if error_days.present? && status_change_journal.created_on <= error_days.days.ago
@@ -95,6 +90,16 @@ module ChiliprojectIssueAging
               return :warning
             end
           end
+        end
+
+        def last_status_change_journal
+          c = ARCondition.new
+          c.add "#{JournalDetail.table_name}.property = 'attr'"
+          c.add "#{JournalDetail.table_name}.prop_key = 'status_id'"
+          c.add ["#{JournalDetail.table_name}.value = ?", status_id.to_s] # value is converted to String
+          journals.first(:include => :details,
+                         :order => 'created_on DESC',
+                         :conditions => c.conditions)
         end
         
       end
