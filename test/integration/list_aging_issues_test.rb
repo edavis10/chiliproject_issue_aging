@@ -49,7 +49,19 @@ class ListAgingIssuesTest < ActionController::IntegrationTest
     
     should "show orange next to warning issues"
     should "show red next to warning issues"
-    should "not show issues that aren't aging"
-    should "not show issues on hidden projects"
+
+    should "not show issues that aren't aging" do
+      visit '/aging_issue_statuses'
+      assert_response :success
+
+      assert has_no_css?("tr#issue-#{@not_aging_issue.id}")
+    end
+    
+    should "not show issues on hidden projects" do
+      visit '/aging_issue_statuses'
+      assert_response :success
+
+      assert has_no_css?("tr#issue-#{@not_visible_issue.id}")
+    end
   end
 end
