@@ -117,4 +117,15 @@ class ActiveSupport::TestCase
   def plugin_configuration
     Setting.plugin_chiliproject_issue_aging
   end
+
+  def generate_journal_for_status_change(issue, created_on=Time.now)
+    j = Journal.new(:journalized => issue, :created_on => created_on)
+    jd = JournalDetail.new(:property => 'attr',
+                           :prop_key => 'status_id',
+                           :old_value => @old_status.id,
+                           :value => @status.id)
+    j.details << jd
+    assert j.save
+
+  end
 end
