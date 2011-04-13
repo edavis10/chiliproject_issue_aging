@@ -29,7 +29,7 @@ module ChiliprojectIssueAging
 
               return {
                 :include => [:journals => :details],
-                :order => "#{Journal.table_name}.created_on DESC",
+                :order => "#{Journal.table_name}.created_on ASC",
                 :conditions => c.conditions
               }
             else
