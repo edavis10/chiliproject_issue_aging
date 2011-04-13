@@ -4,22 +4,30 @@ Plugin to help manage aging issues to potentially catch forgotten work
 
 == Features
 
-TODO: fill in features
+* Two levels of aging: warning and error
+* Aging report showing the open issues that have been stuck in a status the longest
+* Email report of aging issues
+* Redmine Kanban integration - show the number of days an issue has been stuck in a status
 
 == Getting the plugin
 
 A copy of the plugin can be downloaded from {Little Stream Software}[https://projects.littlestreamsoftware.com/projects/chiliproject_issue_aging/files] or from {GitHub}[http://github.com/edavis10/chiliproject_issue_aging]
 
-
 == Installation and Setup
 
 1. Follow the Redmine plugin installation steps at: http://www.redmine.org/wiki/redmine/Plugins 
-2. Run the plugin migrations +rake db:migrate_plugins+
-3. Restart your Redmine web servers (e.g. mongrel, thin, mod_rails)
+2. Restart your Redmine web servers (e.g. mongrel, thin, mod_rails)
 
 == Usage
 
-TODO: Add usage
+To view the Aging report, enter "http://your-chiliproject-url/aging_issue_statuses".
+
+To run the email report, use the rake task `rake issue_aging:send_issue_aging_report`.
+
+Example:
+
+  rake issue_aging:send_issue_aging_report
+  rake issue_aging:send_issue_aging_report users="1,3,5"
 
 == License
 
