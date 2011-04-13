@@ -15,13 +15,13 @@ module ChiliprojectIssueAging
           elsif aging_status == :error
             css_class = 'aging error-state'
           end
-          
-          return content_tag(:span,
-                             time_ago,
-                             {
-                               :title => l(:issue_aging_text_days_ago, :count => time_ago),
-                               :class => css_class
-                             })
+
+          return link_to(time_ago,
+                         {:controller => 'aging_issue_statuses', :action => 'index'},
+                         {
+                           :title => l(:issue_aging_text_days_ago, :count => time_ago),
+                           :class => css_class
+                         })
 
         else
           return ''
