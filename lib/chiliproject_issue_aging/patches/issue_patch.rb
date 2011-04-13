@@ -1,3 +1,5 @@
+require 'ar_condition'
+
 module ChiliprojectIssueAging
   module Patches
     module IssuePatch

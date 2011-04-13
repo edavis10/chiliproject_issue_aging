@@ -1,0 +1,8 @@
+<%= l(:issue_aging_text_mail_body, :count => @issues.size) %>
+
+<% @issues.each do |issue| -%>
+* <%= h("#{issue.project} - #{issue.tracker} ##{issue.id}: #{issue.subject}") %>
+<% end -%>
+
+<%= l(:issue_aging_text_title) %>: <%= url_for({:controller => 'aging_issue_statuses', :action => 'index', :only_path => false}) %>
+

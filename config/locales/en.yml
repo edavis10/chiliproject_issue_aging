@@ -4,3 +4,4 @@ en:
   issue_aging_text_title: "Aging Issues"
   issue_aging_text_last_status_change: "Last status change"
   issue_aging_text_days_ago: "%{count} days ago"
+  issue_aging_text_mail_body: "%{count} aging issues"
