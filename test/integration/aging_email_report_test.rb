@@ -14,19 +14,25 @@ class AgingEmailReportTest < ActionController::IntegrationTest
     @old_status = IssueStatus.generate!
     @closed_status = IssueStatus.generate!(:is_closed => true)
     
-    @warning_issue_for_user1 = Issue.generate_for_project!(@project, :assigned_to => @user, :status => @status, :created_on => 30.days.ago)
-    @warning_issue_for_user2 = Issue.generate_for_project!(@project, :assigned_to => @user2, :status => @status, :created_on => 30.days.ago)
-    @error_issue_for_user1 = Issue.generate_for_project!(@project, :assigned_to => @user, :status => @status, :created_on => 30.days.ago)
-    @error_issue_for_user2 = Issue.generate_for_project!(@project, :assigned_to => @user2, :status => @status, :created_on => 30.days.ago)
-    @not_aging_issue_for_user1 = Issue.generate_for_project!(@project, :assigned_to => @user, :status => @status, :created_on => 30.days.ago)
-    @closed_issue_for_user1 = Issue.generate_for_project!(@project, :assigned_to => @user, :status => @closed_status, :created_on => 30.days.ago)
+    @warning_issue_for_user1 = Issue.generate_for_project!(@project, :assigned_to => @user, :status => @old_status, :created_on => 30.days.ago)
+    change_status(@warning_issue_for_user1, @status)
+    @warning_issue_for_user2 = Issue.generate_for_project!(@project, :assigned_to => @user2, :status => @old_status, :created_on => 30.days.ago)
+    change_status(@warning_issue_for_user2, @status)
+    @error_issue_for_user1 = Issue.generate_for_project!(@project, :assigned_to => @user, :status => @old_status, :created_on => 30.days.ago)
+    change_status(@error_issue_for_user1, @status)
+    @error_issue_for_user2 = Issue.generate_for_project!(@project, :assigned_to => @user2, :status => @old_status, :created_on => 30.days.ago)
+    change_status(@error_issue_for_user2, @status)
+    @not_aging_issue_for_user1 = Issue.generate_for_project!(@project, :assigned_to => @user, :status => @old_status, :created_on => 30.days.ago)
+    change_status(@not_aging_issue_for_user1, @status)
+    @closed_issue_for_user1 = Issue.generate_for_project!(@project, :assigned_to => @user, :status => @old_status, :created_on => 30.days.ago)
+    change_status(@closed_issue_for_user1, @closed_status)
 
-    generate_journal_for_status_change(@warning_issue_for_user1, 8.days.ago)
-    generate_journal_for_status_change(@warning_issue_for_user2, 9.days.ago)
-    generate_journal_for_status_change(@error_issue_for_user1, 16.days.ago)
-    generate_journal_for_status_change(@error_issue_for_user2, 17.days.ago)
-    generate_journal_for_status_change(@not_aging_issue_for_user1, 1.day.ago)
-    generate_journal_for_status_change(@closed_issue_for_user1, 29.days.ago)
+    update_journal_for_status_change(@warning_issue_for_user1, 8.days.ago)
+    update_journal_for_status_change(@warning_issue_for_user2, 9.days.ago)
+    update_journal_for_status_change(@error_issue_for_user1, 16.days.ago)
+    update_journal_for_status_change(@error_issue_for_user2, 17.days.ago)
+    update_journal_for_status_change(@not_aging_issue_for_user1, 1.day.ago)
+    update_journal_for_status_change(@closed_issue_for_user1, 29.days.ago)
   end
 
   should "send an email to each user who has aging issues assigned" do

@@ -24,14 +24,13 @@ module ChiliprojectIssueAging
 
             if status_journal_created_before
               c = ARCondition.new
-              c.add "#{JournalDetail.table_name}.property = 'attr'"
-              c.add "#{JournalDetail.table_name}.prop_key = 'status_id'"
-              c.add ["#{Journal.table_name}.created_on <= ?", status_journal_created_before.days.ago]
-              c.add "#{JournalDetail.table_name}.value = CAST(#{Issue.table_name}.status_id AS CHAR(13))"
+              c.add ["#{Journal.table_name}.changes LIKE(?)", '%status_id%']
+              c.add "#{Journal.table_name}.version > 1"
+              c.add ["#{Journal.table_name}.created_at <= ?", status_journal_created_before.days.ago]
 
               return {
-                :include => [:journals => :details],
-                :order => "#{Journal.table_name}.created_on ASC",
+                :include => :journals,
+                :order => "#{Journal.table_name}.created_at ASC",
                 :conditions => c.conditions
               }
             else
@@ -97,12 +96,13 @@ module ChiliprojectIssueAging
 
         def last_status_change_journal
           c = ARCondition.new
-          c.add "#{JournalDetail.table_name}.property = 'attr'"
-          c.add "#{JournalDetail.table_name}.prop_key = 'status_id'"
-          c.add ["#{JournalDetail.table_name}.value = ?", status_id.to_s] # value is converted to String
-          journals.first(:include => :details,
-                         :order => 'created_on DESC',
-                         :conditions => c.conditions)
+          c.add ["#{Journal.table_name}.changes LIKE(?)", '%status_id%']
+          # Select using Ruby because of the serialized attributes
+          journals.all(:order => 'created_at DESC',
+                       :conditions => c.conditions).detect {|journal|
+            journal.changes["status_id"].present? &&
+            journal.changes["status_id"].last == status_id
+          }
         end
         
       end

@@ -118,14 +118,15 @@ class ActiveSupport::TestCase
     Setting.plugin_chiliproject_issue_aging
   end
 
-  def generate_journal_for_status_change(issue, created_on=Time.now)
-    j = Journal.new(:journalized => issue, :created_on => created_on)
-    jd = JournalDetail.new(:property => 'attr',
-                           :prop_key => 'status_id',
-                           :old_value => @old_status.id,
-                           :value => issue.status.id)
-    j.details << jd
-    assert j.save
+  def update_journal_for_status_change(issue, created_at=Time.now)
+    journal = issue.journals.last
+    journal.update_attribute(:created_at, created_at)
+  end
 
+  def change_status(issue, new_status)
+    issue.reload
+    issue.init_journal(issue.author, "")
+    issue.status = new_status
+    assert issue.save && issue.reload
   end
 end
