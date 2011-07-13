@@ -18,7 +18,7 @@
         <% journal = issue.last_status_change_journal %>
         <%= format_time(journal.created_at) if journal %>
       </td>
-      <td class="project"><%= link_to_project(issue.project) %></td>
+      <td class="project"><%= link_to_project_with_root(issue.project) %></td>
       <td class="subject">
         <%= link_to_issue(issue) %>
       </td>
