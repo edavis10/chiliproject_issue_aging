@@ -12,6 +12,8 @@
             <th>#</th>
             <th><%=l(:issue_aging_text_last_status_change)%></th>
             <th><%=l(:field_project)%></th>
+            <th><%=l(:field_assigned_to)%></th>
+            <th><%=l(:field_status)%></th>
             <th><%=l(:field_subject)%></th>
           </tr></thead>
         <tbody> 
@@ -27,6 +29,8 @@
                 <% end %>
               </td>
               <td class="project"><%= link_to_project_with_root(issue.project) %></td>
+              <td class="assigned_to"><%= link_to_user(issue.assigned_to) %></td>
+              <td class="status"><%= h(issue.status) %></td>
               <td class="subject">
                 <%= link_to_issue(issue) %>
               </td>
