@@ -8,6 +8,13 @@ class AgingIssueStatusesController < ApplicationController
       issue.project.root
     end.sort_by do |project, issues|
       project.name
+    end.collect do |project_issue_data|
+      sorted_issues = project_issue_data.last.sort do |issue_a, issue_b|
+        # Sort by assigned_to and then status, using an array for subsorts
+        [(issue_a.assigned_to_id || 0), issue_a.status.position] <=>
+          [(issue_b.assigned_to_id || 0), issue_b.status.position]
+      end
+      [project_issue_data.first, sorted_issues]
     end
   end
 
