@@ -43,25 +43,24 @@ class AgingIssueStatusesController < ApplicationController
   end
 
   def sort_issues_by_assigned_to_and_kanban_order(issue_a, issue_b)
-    ordered_status_ids =
-      [
-       Setting.plugin_redmine_kanban.try('[]','panes').try('[]','testing').try('[]','status'),
-       Setting.plugin_redmine_kanban.try('[]','panes').try('[]','active').try('[]','status'),
-       Setting.plugin_redmine_kanban.try('[]','panes').try('[]','selected').try('[]','status')
-      ].compact.collect(&:to_i)
+    [ (issue_a.assigned_to_id || 0), kanban_ordered_status_ids.index(issue_a.status_id) ] <=>
+      [ (issue_b.assigned_to_id || 0), kanban_ordered_status_ids.index(issue_b.status_id) ]
+  end
 
-    IssueStatus.all(:order => 'position ASC').each do |issue_status|
-      next if ordered_status_ids.include?(issue_status)
-      ordered_status_ids << issue_status.id
+  def kanban_ordered_status_ids
+    unless @kanban_ordered_status_ids.present?
+      @kanban_ordered_status_ids = [
+         Setting.plugin_redmine_kanban.try('[]','panes').try('[]','testing').try('[]','status'),
+         Setting.plugin_redmine_kanban.try('[]','panes').try('[]','active').try('[]','status'),
+         Setting.plugin_redmine_kanban.try('[]','panes').try('[]','selected').try('[]','status')
+        ].compact.collect(&:to_i)
+
+      IssueStatus.all(:order => 'position ASC').each do |issue_status|
+        next if @kanban_ordered_status_ids.include?(issue_status)
+        @kanban_ordered_status_ids << issue_status.id
+      end
+      
     end
-    [
-     (issue_a.assigned_to_id || 0),
-     ordered_status_ids.index(issue_a.status_id)
-    ] <=>
-      [
-       (issue_b.assigned_to_id || 0),
-       ordered_status_ids.index(issue_b.status_id)
-      ]
-
+    @kanban_ordered_status_ids
   end
 end
