@@ -26,7 +26,11 @@ class AgingIssueStatusesController < ApplicationController
   def sort_issues(project_issues)
     project_issues.collect do |project_issue_data|
       sorted_issues = project_issue_data.last.sort do |issue_a, issue_b|
-        sort_issues_by_assigned_to_and_status_position(issue_a, issue_b)
+        if Setting.respond_to?(:plugin_redmine_kanban)
+          sort_issues_by_assigned_to_and_kanban_order(issue_a, issue_b)
+        else
+          sort_issues_by_assigned_to_and_status_position(issue_a, issue_b)
+        end
       end
       [project_issue_data.first, sorted_issues]
     end
@@ -38,4 +42,26 @@ class AgingIssueStatusesController < ApplicationController
       [(issue_b.assigned_to_id || 0), issue_b.status.position]
   end
 
+  def sort_issues_by_assigned_to_and_kanban_order(issue_a, issue_b)
+    ordered_status_ids =
+      [
+       Setting.plugin_redmine_kanban.try('[]','panes').try('[]','testing').try('[]','status'),
+       Setting.plugin_redmine_kanban.try('[]','panes').try('[]','active').try('[]','status'),
+       Setting.plugin_redmine_kanban.try('[]','panes').try('[]','selected').try('[]','status')
+      ].compact.collect(&:to_i)
+
+    IssueStatus.all(:order => 'position ASC').each do |issue_status|
+      next if ordered_status_ids.include?(issue_status)
+      ordered_status_ids << issue_status.id
+    end
+    [
+     (issue_a.assigned_to_id || 0),
+     ordered_status_ids.index(issue_a.status_id)
+    ] <=>
+      [
+       (issue_b.assigned_to_id || 0),
+       ordered_status_ids.index(issue_b.status_id)
+      ]
+
+  end
 end
