@@ -4,18 +4,12 @@ class AgingIssueStatusesController < ApplicationController
   def index
     @issues = Issue.visible.open.aging_status
     # Convert [issues] to a sorted [[project, [issues],..]
-    @issues_by_project = @issues.group_by do |issue|
+    issues_grouped_and_sorted_by_project = @issues.group_by do |issue|
       issue.project.root
     end.sort_by do |project, issues|
       project.name
-    end.collect do |project_issue_data|
-      sorted_issues = project_issue_data.last.sort do |issue_a, issue_b|
-        # Sort by assigned_to and then status, using an array for subsorts
-        [(issue_a.assigned_to_id || 0), issue_a.status.position] <=>
-          [(issue_b.assigned_to_id || 0), issue_b.status.position]
-      end
-      [project_issue_data.first, sorted_issues]
     end
+    @issues_by_project = sort_issues(issues_grouped_and_sorted_by_project)
   end
 
   protected
@@ -26,4 +20,18 @@ class AgingIssueStatusesController < ApplicationController
     return 'aging error-state' if status == :error
   end
   helper_method :aging_issue_css
+
+  private
+
+  def sort_issues(project_issues)
+    project_issues.collect do |project_issue_data|
+      sorted_issues = project_issue_data.last.sort do |issue_a, issue_b|
+        # Sort by assigned_to and then status, using an array for subsorts
+        [(issue_a.assigned_to_id || 0), issue_a.status.position] <=>
+          [(issue_b.assigned_to_id || 0), issue_b.status.position]
+      end
+      [project_issue_data.first, sorted_issues]
+    end
+  end
+
 end
