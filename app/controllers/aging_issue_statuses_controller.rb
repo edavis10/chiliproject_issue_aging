@@ -3,6 +3,12 @@ class AgingIssueStatusesController < ApplicationController
 
   def index
     @issues = Issue.visible.open.aging_status
+    # Convert [issues] to a sorted [[project, [issues],..]
+    @issues_by_project = @issues.group_by do |issue|
+      issue.project.root
+    end.sort_by do |project, issues|
+      project.name
+    end
   end
 
   protected

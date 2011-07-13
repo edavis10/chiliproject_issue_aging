@@ -1,33 +1,41 @@
 <%= content_tag(:h1, l(:issue_aging_text_title)) %>
 
-<% if @issues && @issues.any? %>
-  <table class="list issues">
-    <thead><tr>
-    <th>#</th>
-    <th><%=l(:issue_aging_text_last_status_change)%></th>
-    <th><%=l(:field_project)%></th>
-    <th><%=l(:field_subject)%></th>
-    </tr></thead>
-    <tbody> 
-    <% @issues.each do |issue| %>
-    <tr id="issue-<%= issue.id %>" class="<%= cycle('odd', 'even') %> <%= issue.css_classes %>">
-      <td class="id">
-        <%= link_to issue.id, :controller => 'issues', :action => 'show', :id => issue %>
-      </td>
-      <td class="<%= aging_issue_css(issue) %>" title="<%= aging_issue_title(issue) %>">
-        <% journal = issue.last_status_change_journal %>
-        <% if journal %>
-            <%= h(number_of_days_ago(journal.created_at)) %>
-        <% end %>
-      </td>
-      <td class="project"><%= link_to_project_with_root(issue.project) %></td>
-      <td class="subject">
-        <%= link_to_issue(issue) %>
-      </td>
-    </tr>
-    <% end %>
-    </tbody>
-  </table>
+<% if @issues_by_project.any? %>
+  <% @issues_by_project.each do |project_issue_data| %>
+    <% root_project, issues = project_issue_data.first, project_issue_data.last %>
+    <% if issues && issues.any? %>
+
+      <h2><%= l(:label_project) %>: <%= h(root_project) %></h2>
+
+      <table class="list issues project-<%= h(root_project.id) %>">
+        <thead><tr>
+            <th>#</th>
+            <th><%=l(:issue_aging_text_last_status_change)%></th>
+            <th><%=l(:field_project)%></th>
+            <th><%=l(:field_subject)%></th>
+          </tr></thead>
+        <tbody> 
+          <% issues.each do |issue| %>
+            <tr id="issue-<%= issue.id %>" class="<%= cycle('odd', 'even') %> <%= issue.css_classes %>">
+              <td class="id">
+                <%= link_to issue.id, :controller => 'issues', :action => 'show', :id => issue %>
+              </td>
+              <td class="<%= aging_issue_css(issue) %>" title="<%= aging_issue_title(issue) %>">
+                <% journal = issue.last_status_change_journal %>
+                <% if journal %>
+                  <%= h(number_of_days_ago(journal.created_at)) %>
+                <% end %>
+              </td>
+              <td class="project"><%= link_to_project_with_root(issue.project) %></td>
+              <td class="subject">
+                <%= link_to_issue(issue) %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% end %><%# issues check %>
+  <% end %><%# each project %>
 <% else %>
   <p class="nodata"><%= l(:label_no_data) %></p>
 <% end %>

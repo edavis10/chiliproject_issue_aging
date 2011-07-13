@@ -4,9 +4,14 @@ class ListAgingIssuesTest < ActionController::IntegrationTest
   def setup
     configure_plugin
     @user = User.generate!(:password => 'test', :password_confirmation => 'test', :admin => false).reload
-    @project = Project.generate!
+    @project = Project.generate!.reload
+    @project2 = Project.generate!.reload
+    @child_project = Project.generate!.reload
+    @child_project.set_parent!(@project2)
     @role = Role.generate!(:permissions => [:view_issues])
     User.add_to_project(@user, @project, @role)
+    User.add_to_project(@user, @project2, @role)
+    User.add_to_project(@user, @child_project, @role)
     @status = IssueStatus.generate!
     @old_status = IssueStatus.generate!
     @closed_status = IssueStatus.generate!(:is_closed => true)
@@ -17,7 +22,7 @@ class ListAgingIssuesTest < ActionController::IntegrationTest
     change_status(@warning_issue2, @status)
     @error_issue1 = Issue.generate_for_project!(@project, :status => @old_status, :created_on => 30.days.ago)
     change_status(@error_issue1, @status)
-    @error_issue2 = Issue.generate_for_project!(@project, :status => @old_status, :created_on => 30.days.ago)
+    @error_issue2 = Issue.generate_for_project!(@child_project, :status => @old_status, :created_on => 30.days.ago)
     change_status(@error_issue2, @status)
     @not_aging_issue = Issue.generate_for_project!(@project, :status => @old_status, :created_on => 30.days.ago)
     change_status(@not_aging_issue, @status)
@@ -55,6 +60,13 @@ class ListAgingIssuesTest < ActionController::IntegrationTest
       assert find("tr#issue-#{@warning_issue2.id}")
       assert find("tr#issue-#{@error_issue1.id}")
       assert find("tr#issue-#{@error_issue2.id}")
+    end
+
+    should "group issues by the root project" do
+      visit '/aging_issue_statuses'
+      assert_response :success
+
+      assert find("table.issues.project-#{@project2.id} tr#issue-#{@error_issue2.id}")
     end
     
     should "show orange next to warning issues" do
